@@ -228,6 +228,12 @@
     padding:9px 18px; border-radius:10px; border:none; background:var(--ink); color:var(--paper); cursor:pointer;
   }
   .send-btn:disabled{opacity:.4; cursor:default;}
+  .copy-btn{
+    font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:11.5px;
+    padding:6px 11px; border-radius:99px; border:1.5px solid var(--rule);
+    background:var(--paper); color:var(--ink-soft); cursor:pointer; white-space:nowrap;
+  }
+  .copy-btn.copied{background:var(--good); border-color:var(--good); color:#fff;}
   .notes{margin-top:16px; display:flex; flex-direction:column; gap:10px;}
   .note{
     background:var(--paper); border:1.5px solid var(--rule); border-radius:12px; padding:10px 13px;
@@ -429,7 +435,10 @@
   <!-- SUGGESTIONS BOARD -->
   <div class="section-head" id="buzon">
     <div class="eyebrow">Buzón familiar</div>
-    <h2>Sugerencias de todos</h2>
+    <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+      <h2 style="margin:0;">Sugerencias de todos</h2>
+      <button id="copy-all-btn" class="copy-btn">📋 Copiar todo</button>
+    </div>
   </div>
 
   <div class="board">
@@ -560,7 +569,10 @@
     return `hace ${Math.floor(diff/86400)} d`;
   }
 
+  let lastNotes = [];
+
   function renderNotes(rows){
+    lastNotes = rows;
     const mount = document.getElementById("notes-mount");
     if(!rows.length){
       mount.innerHTML = '<p class="empty-note">Nadie ha dejado sugerencias todavía — sé el primero.</p>';
@@ -606,6 +618,32 @@
     if(error){ console.error(error); sendBtn.disabled = false; return; }
     msgInput.value = "";
     loadNotes();
+  });
+
+  const copyBtn = document.getElementById("copy-all-btn");
+  copyBtn.addEventListener("click", async ()=>{
+    if(!lastNotes.length){
+      copyBtn.textContent = "Nada que copiar";
+      setTimeout(()=> copyBtn.textContent = "📋 Copiar todo", 1500);
+      return;
+    }
+    const ordered = [...lastNotes].sort((a,b)=> new Date(a.created_at) - new Date(b.created_at));
+    const text = ordered.map(r=>{
+      const when = new Date(r.created_at).toLocaleString("es-MX", { day:"2-digit", month:"short", hour:"2-digit", minute:"2-digit" });
+      const day = dayLabels[r.day_key] || r.day_key;
+      return `[${day} · ${when}] ${r.author}: ${r.message}`;
+    }).join("\n\n");
+    try{
+      await navigator.clipboard.writeText(text);
+      copyBtn.textContent = "✓ Copiado";
+      copyBtn.classList.add("copied");
+    }catch(e){
+      copyBtn.textContent = "No se pudo copiar";
+    }
+    setTimeout(()=>{
+      copyBtn.textContent = "📋 Copiar todo";
+      copyBtn.classList.remove("copied");
+    }, 1800);
   });
 
   // ---------- Realtime ----------
