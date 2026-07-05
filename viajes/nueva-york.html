@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NYC · Familia González Tiscareño · 7–14 jul 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800;900&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F3ECD9;
+    --paper-2:#EAE0C4;
+    --card:#FBF8EF;
+    --ink:#12203D;
+    --ink-soft:#4B5768;
+    --ink-faint:#8A8266;
+    --rule:#D9CEA9;
+    --line-gray:#8A8D90;
+    --line-green:#00933C;
+    --line-brown:#996633;
+    --line-purple:#B933AD;
+    --line-orange:#E35205;
+    --line-red:#D62B1F;
+    --good:#2C7A45;
+    --warn:#B4530A;
+    --shadow: 0 1px 0 rgba(18,32,61,.06), 0 8px 20px -12px rgba(18,32,61,.25);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    background-image:
+      radial-gradient(circle at 1px 1px, rgba(18,32,61,.05) 1px, transparent 0);
+    background-size: 14px 14px;
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  .display{font-family:'Archivo',sans-serif; font-weight:900; letter-spacing:-.01em;}
+  a{color:inherit;}
+
+  /* ---------- Sticky nav ---------- */
+  .navbar{
+    position:sticky; top:0; z-index:50;
+    background:rgba(243,236,217,.92);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--rule);
+    padding:10px 14px;
+  }
+  .navbar-inner{max-width:720px;margin:0 auto;display:flex;align-items:center;gap:10px;}
+  .navbar-title{font-family:'Archivo',sans-serif;font-weight:800;font-size:14px;white-space:nowrap;}
+  .navbar-title span{color:var(--ink-faint);font-weight:600;}
+  .pillrow{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;}
+  .pillrow::-webkit-scrollbar{display:none;}
+  .pill{
+    flex:0 0 auto;
+    font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:11px;
+    padding:5px 9px; border-radius:99px;
+    border:1.5px solid var(--rule);
+    background:var(--card); color:var(--ink-soft);
+    text-decoration:none; white-space:nowrap;
+  }
+
+  .wrap{max-width:720px;margin:0 auto;padding:22px 16px 80px;}
+
+  /* ---------- Hero ticket ---------- */
+  .ticket{
+    position:relative;
+    background:var(--ink);
+    color:var(--paper);
+    border-radius:16px;
+    padding:22px 22px 18px;
+    box-shadow:var(--shadow);
+    overflow:hidden;
+    margin-bottom:8px;
+  }
+  .ticket::before{
+    content:"";
+    position:absolute; inset:0;
+    background-image: repeating-linear-gradient(115deg, rgba(255,255,255,.035) 0 2px, transparent 2px 26px);
+    pointer-events:none;
+  }
+  .ticket-eyebrow{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.14em;
+    text-transform:uppercase; color:#C9B98A; margin-bottom:6px;
+  }
+  .ticket h1{
+    font-family:'Archivo',sans-serif; font-weight:900; font-size:28px; line-height:1.05;
+    margin:0 0 14px; letter-spacing:-.01em;
+  }
+  .ticket h1 em{font-style:normal; color:#E8B94A;}
+  .ticket-row{
+    display:flex; justify-content:space-between; gap:10px;
+    border-top:1px dashed rgba(243,236,217,.28);
+    padding:10px 0; font-size:13px;
+  }
+  .ticket-row:first-of-type{border-top:1px dashed rgba(243,236,217,.28);}
+  .ticket-label{color:#C9B98A; font-family:'IBM Plex Mono',monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:.08em;}
+  .ticket-value{font-weight:600; text-align:right;}
+  .perf{
+    position:relative; height:0;
+  }
+  .perf::before{
+    content:""; position:absolute; left:-32px; top:-11px;
+    width:22px; height:22px; border-radius:50%; background:var(--paper);
+  }
+  .perf::after{
+    content:""; position:absolute; right:-32px; top:-11px;
+    width:22px; height:22px; border-radius:50%; background:var(--paper);
+  }
+
+  /* ---------- Family strip ---------- */
+  .fam{display:flex; gap:8px; margin:14px 2px 26px; flex-wrap:wrap;}
+  .fam-chip{
+    font-size:12px; font-weight:600; padding:6px 11px; border-radius:99px;
+    background:var(--card); border:1.5px solid var(--rule); color:var(--ink-soft);
+  }
+
+  /* ---------- Section headers ---------- */
+  .section-head{margin:38px 0 14px;}
+  .section-head .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-faint);}
+  .section-head h2{font-family:'Archivo',sans-serif;font-weight:900;font-size:20px;margin:2px 0 0;}
+
+  /* ---------- Subway spine ---------- */
+  .spine{position:relative; padding-left:30px;}
+  .spine-line{
+    position:absolute; left:9px; top:6px; bottom:6px; width:3px;
+    background:var(--rule); border-radius:3px;
+  }
+  .stop{position:relative; margin-bottom:22px;}
+  .stop:last-child{margin-bottom:0;}
+  .stop-dot{
+    position:absolute; left:-30px; top:2px;
+    width:20px; height:20px; border-radius:50%;
+    border:4px solid var(--paper);
+    box-shadow:0 0 0 2px var(--dot-color, var(--line-gray));
+    background:var(--dot-color, var(--line-gray));
+  }
+  .stop-card{
+    background:var(--card); border-radius:14px; padding:16px 16px 14px;
+    box-shadow:var(--shadow); border-top:4px solid var(--dot-color, var(--line-gray));
+  }
+  .stop-date{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600;
+    color:var(--dot-color, var(--ink-soft)); text-transform:uppercase; letter-spacing:.06em;
+  }
+  .stop-card h3{
+    font-family:'Archivo',sans-serif; font-weight:800; font-size:18px; margin:2px 0 10px;
+  }
+  .stop-card p{margin:0 0 8px; font-size:14.5px; color:var(--ink);}
+  .stop-card p:last-child{margin-bottom:0;}
+  .stop-card .muted{color:var(--ink-soft); font-size:13.5px;}
+  .tag{
+    display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:10.5px; font-weight:600;
+    padding:2px 7px; border-radius:5px; background:rgba(18,32,61,.06); color:var(--ink-soft);
+    margin-right:5px;
+  }
+  .confirmed{
+    display:inline-flex; align-items:center; gap:5px;
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px; font-weight:600;
+    color:var(--good); margin-top:2px;
+  }
+  .confirmed::before{content:"●"; font-size:8px;}
+  .split{display:grid; grid-template-columns:1fr; gap:12px; margin-top:12px;}
+  @media(min-width:520px){ .split{grid-template-columns:1fr 1fr;} }
+  .split-card{
+    background:rgba(18,32,61,.035); border:1.5px solid var(--rule); border-radius:12px; padding:12px 13px;
+  }
+  .split-card .who{font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--ink-soft); margin-bottom:6px; display:block;}
+  .split-card p{font-size:13.5px; margin:0 0 6px;}
+  .split-card p:last-child{margin-bottom:0;}
+
+  /* ---------- Checklist ---------- */
+  .check-group{margin-bottom:18px;}
+  .check-group-title{font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-faint); margin-bottom:8px;}
+  .check-item{
+    display:flex; align-items:flex-start; gap:11px;
+    background:var(--card); border-radius:12px; padding:12px 14px; margin-bottom:8px;
+    box-shadow:var(--shadow); cursor:pointer; border:1.5px solid transparent;
+    transition:border-color .15s ease;
+  }
+  .check-item:hover{border-color:var(--rule);}
+  .check-item.done{opacity:.55;}
+  .check-box{
+    flex:0 0 auto; width:20px; height:20px; border-radius:6px; margin-top:1px;
+    border:2px solid var(--ink-soft); display:flex; align-items:center; justify-content:center;
+    font-size:13px; color:transparent; font-weight:900;
+  }
+  .check-item.done .check-box{ background:var(--good); border-color:var(--good); color:#fff; }
+  .check-item.done .check-box::after{content:"✓";}
+  .check-text{font-size:14px; flex:1;}
+  .check-item.done .check-text{text-decoration:line-through; text-decoration-color:var(--ink-faint);}
+  .check-meta{font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-faint); margin-top:3px;}
+  .confirmed-list{list-style:none; margin:0; padding:0;}
+  .confirmed-list li{
+    display:flex; justify-content:space-between; gap:10px;
+    padding:10px 0; border-bottom:1px dashed var(--rule); font-size:13.5px;
+  }
+  .confirmed-list li:last-child{border-bottom:none;}
+  .confirmed-list .code{font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-soft);}
+
+  /* ---------- Suggestions board ---------- */
+  .board{background:var(--card); border-radius:16px; padding:16px; box-shadow:var(--shadow);}
+  .who-picker{display:flex; gap:7px; flex-wrap:wrap; margin-bottom:12px;}
+  .who-btn{
+    font-family:'Inter'; font-weight:600; font-size:13px; padding:7px 13px;
+    border-radius:99px; border:1.5px solid var(--rule); background:var(--paper);
+    color:var(--ink-soft); cursor:pointer;
+  }
+  .who-btn.active{background:var(--ink); color:var(--paper); border-color:var(--ink);}
+  .board textarea{
+    width:100%; border:1.5px solid var(--rule); border-radius:12px; padding:11px 12px;
+    font-family:'Inter'; font-size:14px; resize:vertical; min-height:64px; background:var(--paper);
+    color:var(--ink);
+  }
+  .board textarea:focus{outline:2px solid var(--ink); outline-offset:1px;}
+  .board-row{display:flex; gap:8px; margin-top:9px; align-items:center;}
+  select.daytag{
+    font-family:'IBM Plex Mono',monospace; font-size:12px; padding:8px 10px;
+    border-radius:10px; border:1.5px solid var(--rule); background:var(--paper); color:var(--ink-soft);
+  }
+  .send-btn{
+    margin-left:auto; font-family:'Archivo',sans-serif; font-weight:800; font-size:13px;
+    padding:9px 18px; border-radius:10px; border:none; background:var(--ink); color:var(--paper); cursor:pointer;
+  }
+  .send-btn:disabled{opacity:.4; cursor:default;}
+  .notes{margin-top:16px; display:flex; flex-direction:column; gap:10px;}
+  .note{
+    background:var(--paper); border:1.5px solid var(--rule); border-radius:12px; padding:10px 13px;
+  }
+  .note-top{display:flex; justify-content:space-between; gap:8px; margin-bottom:4px;}
+  .note-author{font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:11.5px; color:var(--ink);}
+  .note-when{font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-faint);}
+  .note-tag{font-family:'IBM Plex Mono',monospace; font-size:10px; color:var(--ink-faint); margin-bottom:3px; display:block;}
+  .note p{margin:0; font-size:13.5px; color:var(--ink);}
+  .empty-note{font-size:13px; color:var(--ink-faint); font-style:italic; padding:6px 2px;}
+
+  footer{
+    max-width:720px; margin:0 auto; padding:0 16px 40px; text-align:center;
+    font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-faint);
+  }
+</style>
+</head>
+<body>
+
+<div class="navbar">
+  <div class="navbar-inner">
+    <a href="/" class="navbar-title" style="text-decoration:none;">← Goti <span>· NYC</span></a>
+    <div class="pillrow">
+      <a class="pill" href="#d1">MAR 7</a>
+      <a class="pill" href="#d2">MIÉ 8</a>
+      <a class="pill" href="#d3">JUE 9</a>
+      <a class="pill" href="#d4">VIE 10</a>
+      <a class="pill" href="#d5">SÁB 11</a>
+      <a class="pill" href="#d6">DOM 12</a>
+      <a class="pill" href="#d7">LUN 13</a>
+      <a class="pill" href="#d8">MAR 14</a>
+      <a class="pill" href="#reservaciones">✓ RESERVAS</a>
+      <a class="pill" href="#buzon">💬 SUGERENCIAS</a>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- HERO TICKET -->
+  <div class="ticket">
+    <div class="ticket-eyebrow">Boarding pass · Familia González Tiscareño</div>
+    <h1>Monterrey <em>→</em> Nueva York</h1>
+    <div class="ticket-row">
+      <div><div class="ticket-label">Vuelo ida</div><div class="mono" style="font-size:12.5px;margin-top:2px;">AM978 / AM3113 · MTY–ATL–EWR</div></div>
+      <div class="ticket-value">mar 7, 7:52a</div>
+    </div>
+    <div class="ticket-row">
+      <div><div class="ticket-label">Vuelo regreso</div><div class="mono" style="font-size:12.5px;margin-top:2px;">AM407 · JFK–MTY</div></div>
+      <div class="ticket-value">mar 14, 9:30a</div>
+    </div>
+    <div class="ticket-row">
+      <div><div class="ticket-label">Confirmación Aeroméxico</div></div>
+      <div class="ticket-value mono">ICQEBG</div>
+    </div>
+    <div class="ticket-row">
+      <div><div class="ticket-label">Hotel</div><div style="margin-top:2px;">San Carlos Hotel · 7 noches · 2 hab.</div></div>
+      <div class="ticket-value mono">#188913028</div>
+    </div>
+    <div class="perf"></div>
+  </div>
+
+  <div class="fam">
+    <span class="fam-chip">Manuel · 55</span>
+    <span class="fam-chip">Gaby · 49</span>
+    <span class="fam-chip">Sofía · 21</span>
+    <span class="fam-chip">Eugenia "la Güera" · 17</span>
+  </div>
+
+  <!-- ITINERARY -->
+  <div class="section-head">
+    <div class="eyebrow">Ruta del viaje</div>
+    <h2>Itinerario día a día</h2>
+  </div>
+
+  <div class="spine">
+    <div class="spine-line"></div>
+
+    <div class="stop" id="d1" style="--dot-color:var(--line-gray)">
+      <div class="stop-dot"></div>
+      <div class="stop-card">
+        <div class="stop-date">Martes 7 jul</div>
+        <h3>Llegada a Nueva York</h3>
+        <p><span class="tag">EWR</span> Aterrizan ~5:53pm hora pico. Car service / UberXL pre-reservado al hotel (45–75 min, ~$90–110).</p>
+        <p class="muted">Check-in San Carlos Hotel. Cena ligera y tranquila en Midtown East — sin planes grandes, jet lag primero.</p>
+      </div>
+    </div>
+
+    <div class="stop" id="d2" style="--dot-color:var(--line-green)">
+      <div class="stop-dot"></div>
+      <div class="stop-card">
+        <div class="stop-date">Miércoles 8 jul</div>
+        <h3>Estatua de la Libertad + Ellis Island</h3>
+        <p><span class="tag">4 / 5</span> a Bowling Green. Ferry desde Battery Park, primer turno de la mañana (CityPASS).</p>
+        <p class="muted">Medio día. Tarde relajada caminando por el Financial District.</p>
+      </div>
+    </div>
+
+    <div class="stop" id="d3" style="--dot-color:var(--line-brown)">
+      <div class="stop-dot"></div>
+      <div class="stop-card">
+        <div class="stop-date">Jueves 9 jul</div>
+        <h3>Memorial del 11S + Chinatown</h3>
+        <p><span class="tag">E</span> al World Trade Center: Memorial y Museo del 11S (CityPASS, reservar mañana).</p>
+        <p><span class="tag">J / Z</span> de Fulton a Canal St — Chinatown y Little Italy a pie (el plan de Gaby).</p>
+        <p class="confirmed">Cena confirmada · Delmonico's, 8:00pm · 4 personas</p>
+      </div>
+    </div>
+
+    <div class="stop" id="d4" style="--dot-color:var(--line-purple)">
+      <div class="stop-dot"></div>
+      <div class="stop-card">
+        <div class="stop-date">Viernes 10 jul</div>
+        <h3>Midtown + teatro</h3>
+        <p>Mañana tranquila.</p>
+        <p class="confirmed">Comida confirmada · Grand Central Oyster Bar, 1:00pm · 4 personas</p>
+        <p>Tarde: Grand Central, NY Public Library, Bryant Park, Times Square.</p>
+        <p class="confirmed">Teatro confirmado · MJ The Musical, 7:00pm · Neil Simon Theatre</p>
+      </div>
+    </div>
+
+    <div class="stop" id="d5" style="--dot-color:var(--line-orange)">
+      <div class="stop-dot"></div>
+      <div class="stop-card">
+        <div class="stop-date">Sábado 11 jul</div>
+        <h3>Uptown: museos y Central Park</h3>
+        <p><span class="tag">B / C</span> a 81 St: Museo Americano de Historia Natural (CityPASS, mañana).</p>
+        <p>Cruzar Central Park a pie hasta Museum Mile.</p>
+        <p>Guggenheim (CityPASS, tarde). Cena en Upper East Side — el 4/5/6 baja directo al hotel.</p>
+      </div>
+    </div>
+
+    <div class="stop" id="d6" style="--dot-color:var(--line-red)">
+      <div class="stop-dot"></div>
+      <div class="stop-card">
+        <div class="stop-date">Domingo 12 jul</div>
+        <h3>Empire State + noche dividida</h3>
+        <p>Empire State Building (CityPASS, horario reservado) — a 3 cuadras del Madison Square Garden.</p>
+        <div class="split">
+          <div class="split-card">
+            <span class="who">Manuel + Sofía</span>
+            <p class="confirmed">Bon Jovi: Forever Tour · 7:30pm</p>
+            <p class="muted">Madison Square Garden. Uber de regreso al hotel.</p>
+          </div>
+          <div class="split-card">
+            <span class="who">Gaby + Eugenia</span>
+            <p><strong>Summit One Vanderbilt</strong> · reservar 7:15–7:45pm</p>
+            <p class="muted">Atardecer ~8:24pm: día → golden hour → luces de noche. 1 min de Grand Central. Cena ligera arriba en Après, piso 93.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stop" id="d7" style="--dot-color:var(--line-orange)">
+      <div class="stop-dot"></div>
+      <div class="stop-card">
+        <div class="stop-date">Lunes 13 jul</div>
+        <h3>Día libre · Lower East Side</h3>
+        <p><strong>Katz's Delicatessen</strong> (205 E Houston) — el pastrami de Manuel. Sin reserva, compartirlo entre varios.</p>
+        <p class="muted">Paseo a su ritmo por Nolita / Little Italy. Última noche en el hotel, maletas con calma.</p>
+        <p class="muted">Bagel de la Güera cualquier mañana: <strong>Ess-a-Bagel</strong>, a 2 cuadras del hotel (3ª Av y 51).</p>
+      </div>
+    </div>
+
+    <div class="stop" id="d8" style="--dot-color:var(--line-gray)">
+      <div class="stop-dot"></div>
+      <div class="stop-card">
+        <div class="stop-date">Martes 14 jul</div>
+        <h3>Salida</h3>
+        <p><span class="tag">JFK T4</span> Taxi/Uber desde el hotel ~6:15am.</p>
+        <p class="confirmed">Vuelo confirmado · AM407, 9:30am → Monterrey 12:15pm</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RESERVATIONS -->
+  <div class="section-head" id="reservaciones">
+    <div class="eyebrow">Checklist compartido</div>
+    <h2>Qué falta por reservar</h2>
+  </div>
+
+  <div id="checklist-mount">
+    <p class="empty-note">Cargando checklist…</p>
+  </div>
+
+  <div class="check-group" style="margin-top:22px;">
+    <div class="check-group-title">Ya confirmado — no tocar</div>
+    <ul class="confirmed-list">
+      <li><span>Vuelos MTY ⇄ NYC</span><span class="code">#ICQEBG</span></li>
+      <li><span>San Carlos Hotel</span><span class="code">#188913028</span></li>
+      <li><span>Delmonico's · jue 8pm</span><span class="code">4 pax</span></li>
+      <li><span>Grand Central Oyster Bar · vie 1pm</span><span class="code">4 pax</span></li>
+      <li><span>MJ The Musical · vie 7pm</span><span class="code">Neil Simon</span></li>
+      <li><span>Bon Jovi · dom 7:30pm</span><span class="code">MSG</span></li>
+    </ul>
+  </div>
+
+  <!-- SUGGESTIONS BOARD -->
+  <div class="section-head" id="buzon">
+    <div class="eyebrow">Buzón familiar</div>
+    <h2>Sugerencias de todos</h2>
+  </div>
+
+  <div class="board">
+    <div class="who-picker" id="who-picker">
+      <button class="who-btn" data-who="Manuel">Manuel</button>
+      <button class="who-btn" data-who="Gaby">Gaby</button>
+      <button class="who-btn" data-who="Sofía">Sofía</button>
+      <button class="who-btn" data-who="La Güera">La Güera</button>
+    </div>
+    <textarea id="msg-input" placeholder="Escribe tu sugerencia, cambio de plan, o antojo…"></textarea>
+    <div class="board-row">
+      <select class="daytag" id="day-tag">
+        <option value="general">General</option>
+        <option value="d1">Mar 7 · Llegada</option>
+        <option value="d2">Mié 8 · Libertad</option>
+        <option value="d3">Jue 9 · 11S / Chinatown</option>
+        <option value="d4">Vie 10 · Midtown / MJ</option>
+        <option value="d5">Sáb 11 · Uptown</option>
+        <option value="d6">Dom 12 · Empire / Bon Jovi / Summit</option>
+        <option value="d7">Lun 13 · LES</option>
+        <option value="d8">Mar 14 · Salida</option>
+      </select>
+      <button class="send-btn" id="send-btn" disabled>Enviar</button>
+    </div>
+    <div class="notes" id="notes-mount">
+      <p class="empty-note">Cargando sugerencias…</p>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  Hecho para la familia González Tiscareño · se actualiza en vivo para todos
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+  const SUPABASE_URL = "https://jgxzbnpbhbrrsedjmnbm.supabase.co";
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpneHpibnBiaGJycnNlZGptbmJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzMjkzMzksImV4cCI6MjA5NzkwNTMzOX0.PHAVOJYURjM0PP0_Otxa5rn1-Xc-hRhxkB6wWatp4MM";
+  const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  const TRIP_KEY = "nyc-2026";
+
+  const CHECKLIST_ORDER = [
+    "citypass-liberty","citypass-911","citypass-naturalhistory","citypass-guggenheim","citypass-empirestate",
+    "summit-vanderbilt","transport-ewr","transport-jfk",
+    "dinner-mie8","dinner-vie10","dinner-sab11"
+  ];
+  const GROUPS = [
+    { title: "CityPASS · reservar horario", prefix: "citypass" },
+    { title: "Transporte de aeropuerto", prefix: "transport" },
+    { title: "Summit One Vanderbilt", prefix: "summit" },
+    { title: "Cenas abiertas", prefix: "dinner" },
+  ];
+
+  let whoAmI = localStorage.getItem("nyc-trip-who") || null;
+  function setWho(name){
+    whoAmI = name;
+    localStorage.setItem("nyc-trip-who", name);
+    document.querySelectorAll(".who-btn").forEach(b=>{
+      b.classList.toggle("active", b.dataset.who === name);
+    });
+    document.getElementById("send-btn").disabled = !(whoAmI && document.getElementById("msg-input").value.trim());
+  }
+  document.querySelectorAll(".who-btn").forEach(btn=>{
+    btn.addEventListener("click", ()=> setWho(btn.dataset.who));
+  });
+  if (whoAmI) setWho(whoAmI);
+
+  // ---------- Checklist ----------
+  function renderChecklist(rows){
+    const byId = Object.fromEntries(rows.map(r=>[r.id, r]));
+    const mount = document.getElementById("checklist-mount");
+    mount.innerHTML = "";
+    GROUPS.forEach(group=>{
+      const items = CHECKLIST_ORDER
+        .filter(id=>id.startsWith(group.prefix) && byId[id])
+        .map(id=>byId[id]);
+      if(!items.length) return;
+      const wrap = document.createElement("div");
+      wrap.className = "check-group";
+      const title = document.createElement("div");
+      title.className = "check-group-title";
+      title.textContent = group.title;
+      wrap.appendChild(title);
+      items.forEach(item=>{
+        const el = document.createElement("div");
+        el.className = "check-item" + (item.done ? " done" : "");
+        el.innerHTML = `
+          <div class="check-box"></div>
+          <div>
+            <div class="check-text">${item.label}</div>
+            ${item.done && item.updated_by ? `<div class="check-meta">reservado por ${item.updated_by}</div>` : ""}
+          </div>`;
+        el.addEventListener("click", ()=> toggleCheck(item));
+        wrap.appendChild(el);
+      });
+      mount.appendChild(wrap);
+    });
+  }
+
+  async function toggleCheck(item){
+    const nextDone = !item.done;
+    const who = whoAmI || "alguien";
+    const { error } = await sb.from("trip_checklist")
+      .update({ done: nextDone, updated_by: who, updated_at: new Date().toISOString() })
+      .eq("id", item.id);
+    if(error) console.error(error);
+    loadChecklist();
+  }
+
+  async function loadChecklist(){
+    const { data, error } = await sb.from("trip_checklist").select("*").eq("trip_key", TRIP_KEY);
+    if(error){ console.error(error); return; }
+    renderChecklist(data);
+  }
+
+  // ---------- Suggestions ----------
+  const dayLabels = {
+    general:"General", d1:"Mar 7", d2:"Mié 8", d3:"Jue 9", d4:"Vie 10",
+    d5:"Sáb 11", d6:"Dom 12", d7:"Lun 13", d8:"Mar 14"
+  };
+
+  function timeAgo(iso){
+    const diff = (Date.now() - new Date(iso).getTime())/1000;
+    if(diff < 60) return "hace un momento";
+    if(diff < 3600) return `hace ${Math.floor(diff/60)} min`;
+    if(diff < 86400) return `hace ${Math.floor(diff/3600)} h`;
+    return `hace ${Math.floor(diff/86400)} d`;
+  }
+
+  function renderNotes(rows){
+    const mount = document.getElementById("notes-mount");
+    if(!rows.length){
+      mount.innerHTML = '<p class="empty-note">Nadie ha dejado sugerencias todavía — sé el primero.</p>';
+      return;
+    }
+    mount.innerHTML = "";
+    rows.forEach(r=>{
+      const el = document.createElement("div");
+      el.className = "note";
+      el.innerHTML = `
+        <span class="note-tag">${dayLabels[r.day_key] || r.day_key}</span>
+        <div class="note-top">
+          <span class="note-author">${r.author}</span>
+          <span class="note-when">${timeAgo(r.created_at)}</span>
+        </div>
+        <p></p>`;
+      el.querySelector("p").textContent = r.message;
+      mount.appendChild(el);
+    });
+  }
+
+  async function loadNotes(){
+    const { data, error } = await sb.from("trip_suggestions").select("*").eq("trip_key", TRIP_KEY).order("created_at", { ascending:false });
+    if(error){ console.error(error); return; }
+    renderNotes(data);
+  }
+
+  const msgInput = document.getElementById("msg-input");
+  const sendBtn = document.getElementById("send-btn");
+  msgInput.addEventListener("input", ()=>{
+    sendBtn.disabled = !(whoAmI && msgInput.value.trim());
+  });
+  sendBtn.addEventListener("click", async ()=>{
+    const message = msgInput.value.trim();
+    if(!whoAmI || !message) return;
+    sendBtn.disabled = true;
+    sendBtn.textContent = "Enviando…";
+    const dayKey = document.getElementById("day-tag").value;
+    const { error } = await sb.from("trip_suggestions").insert({
+      day_key: dayKey, author: whoAmI, message, trip_key: TRIP_KEY
+    });
+    sendBtn.textContent = "Enviar";
+    if(error){ console.error(error); sendBtn.disabled = false; return; }
+    msgInput.value = "";
+    loadNotes();
+  });
+
+  // ---------- Realtime ----------
+  sb.channel("trip-live")
+    .on("postgres_changes", { event:"*", schema:"public", table:"trip_suggestions" }, loadNotes)
+    .on("postgres_changes", { event:"*", schema:"public", table:"trip_checklist" }, loadChecklist)
+    .subscribe();
+
+  loadChecklist();
+  loadNotes();
+</script>
+</body>
+</html>
