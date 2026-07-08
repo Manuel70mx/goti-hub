@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hoy · Familia Goti</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800;900&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F3ECD9;
+    --card:#FBF8EF;
+    --ink:#12203D;
+    --ink-soft:#4B5768;
+    --ink-faint:#8A8266;
+    --rule:#D9CEA9;
+    --line-orange:#E35205;
+    --good:#2C7A45;
+    --shadow: 0 1px 0 rgba(18,32,61,.06), 0 8px 20px -12px rgba(18,32,61,.25);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--paper);
+    background-image: radial-gradient(circle at 1px 1px, rgba(18,32,61,.05) 1px, transparent 0);
+    background-size:14px 14px;
+    color:var(--ink); font-family:'Inter',system-ui,sans-serif; -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  a{color:inherit;}
+  .navbar{
+    position:sticky; top:0; z-index:50; background:rgba(243,236,217,.92); backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--rule); padding:12px 16px;
+  }
+  .navbar a{ font-family:'Archivo',sans-serif; font-weight:800; font-size:14px; text-decoration:none; }
+  .navbar span{color:var(--ink-faint); font-weight:600;}
+  .wrap{max-width:640px; margin:0 auto; padding:20px 16px 70px;}
+
+  .hero{ margin-bottom:24px; }
+  .eyebrow{font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint);}
+  h1{font-family:'Archivo',sans-serif; font-weight:900; font-size:26px; margin:4px 0 0; letter-spacing:-.01em;}
+
+  .route{position:relative; padding-left:28px;}
+  .route-line{position:absolute; left:9px; top:6px; bottom:6px; width:3px; background:var(--rule); border-radius:3px;}
+  .stop{position:relative; margin-bottom:16px;}
+  .stop:last-child{margin-bottom:0;}
+  .stop-dot{
+    position:absolute; left:-28px; top:2px; width:18px; height:18px; border-radius:50%;
+    border:4px solid var(--paper); background:var(--line-orange); box-shadow:0 0 0 2px var(--line-orange);
+  }
+  .stop-card{background:var(--card); border-radius:14px; padding:14px 16px; box-shadow:var(--shadow); border-top:4px solid var(--line-orange);}
+  .stop-time{font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:700; color:var(--line-orange); text-transform:uppercase; letter-spacing:.05em;}
+  .stop-card h3{font-family:'Archivo',sans-serif; font-weight:800; font-size:16.5px; margin:2px 0 6px;}
+  .stop-card p{margin:0; font-size:14px; color:var(--ink-soft);}
+
+  .transit{
+    display:flex; align-items:center; gap:8px; margin:8px 0 8px 0;
+    font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-faint);
+    padding-left:2px;
+  }
+  .transit .icon{font-size:14px;}
+
+  .confirmed{
+    display:inline-flex; align-items:center; gap:5px; font-family:'IBM Plex Mono',monospace; font-size:10.5px;
+    font-weight:600; color:var(--good); margin-top:4px;
+  }
+  .confirmed::before{content:"●"; font-size:8px;}
+
+  .note{
+    margin-top:22px; background:var(--card); border:1.5px solid var(--rule); border-radius:14px;
+    padding:14px 16px; font-size:13.5px; color:var(--ink-soft);
+  }
+</style>
+</head>
+<body>
+
+<div class="navbar">
+  <a href="/">← Goti <span>· hoy</span></a>
+</div>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="eyebrow">Miércoles 8 de julio</div>
+    <h1>Katz's, SoHo, Friends y LEGO</h1>
+  </div>
+
+  <div class="route">
+    <div class="route-line"></div>
+
+    <div class="stop">
+      <div class="stop-dot"></div>
+      <div class="stop-card">
+        <div class="stop-time">~11:00 AM</div>
+        <h3>Salen del hotel</h3>
+        <p>San Carlos Hotel → Katz's, en yellow cab.</p>
+      </div>
+    </div>
+    <div class="transit"><span class="icon">🚕</span> Yellow cab, ~20-25 min</div>
+
+    <div class="stop">
+      <div class="stop-dot"></div>
+      <div class="stop-card">
+        <div class="stop-time">~11:30 AM · Comida</div>
+        <h3>Katz's Delicatessen</h3>
+        <p>205 E Houston St. El pastrami, antes de que se llene. Sin reserva.</p>
+      </div>
+    </div>
+    <div class="transit"><span class="icon">🚶</span> Caminando, 5-10 min</div>
+
+    <div class="stop">
+      <div class="stop-dot"></div>
+      <div class="stop-card">
+        <div class="stop-time">Tarde</div>
+        <h3>SoHo — shopping</h3>
+        <p>El pedido de la Güera. Houston St es prácticamente el borde de SoHo.</p>
+      </div>
+    </div>
+    <div class="transit"><span class="icon">🚇</span> Subway (6) o Uber, ~15-20 min — dejen colchón para llegar antes de las 4pm</div>
+
+    <div class="stop">
+      <div class="stop-dot"></div>
+      <div class="stop-card">
+        <div class="stop-time">4:00 PM</div>
+        <h3>The FRIENDS™ Experience</h3>
+        <p>130 E 23rd St (Flatiron).</p>
+        <p class="confirmed">Boleto confirmado</p>
+      </div>
+    </div>
+    <div class="transit"><span class="icon">🚇</span> Subway (6 desde 23rd St) o Uber, ~15-20 min</div>
+
+    <div class="stop">
+      <div class="stop-dot"></div>
+      <div class="stop-card">
+        <div class="stop-time">~5:30-6:00 PM</div>
+        <h3>LEGO Store</h3>
+        <p>636 5th Ave, Rockefeller Center. Abre hasta las 8pm, sin prisa. Queda casi enfrente del hotel.</p>
+      </div>
+    </div>
+    <div class="transit"><span class="icon">🚶</span> Caminando, 2-3 cuadras</div>
+
+    <div class="stop">
+      <div class="stop-dot"></div>
+      <div class="stop-card">
+        <div class="stop-time">Noche</div>
+        <h3>Cena libre</h3>
+        <p>Joe's Pizza queda fuera del plan de hoy. Deciden sobre la marcha, cerca del hotel.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="note">Este resumen es solo del día de hoy. El itinerario completo del viaje sigue en <a href="/viajes/nueva-york.html" style="text-decoration:underline;">la página del viaje</a>.</div>
+</div>
+
+</body>
+</html>
