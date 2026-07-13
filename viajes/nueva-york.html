@@ -766,12 +766,6 @@
   </div>
 
   <div class="board">
-    <div class="who-picker" id="who-picker">
-      <button class="who-btn" data-who="Manuel">Manuel</button>
-      <button class="who-btn" data-who="Gaby">Gaby</button>
-      <button class="who-btn" data-who="Sofía">Sofía</button>
-      <button class="who-btn" data-who="La Güera">La Güera</button>
-    </div>
     <textarea id="msg-input" placeholder="Escribe tu sugerencia, cambio de plan, o antojo…"></textarea>
     <div class="board-row">
       <select class="daytag" id="day-tag">
@@ -815,22 +809,6 @@
   </div>
 </div>
 
-<!-- Modal: quién eres (antes de subir) -->
-<div class="upload-modal-overlay" id="who-modal-overlay">
-  <div class="upload-modal">
-    <h4>¿Quién sube esta foto/video?</h4>
-    <div class="who-picker" id="who-modal-buttons" style="margin-bottom:14px;">
-      <button class="who-btn" data-who="Manuel">Manuel</button>
-      <button class="who-btn" data-who="Gaby">Gaby</button>
-      <button class="who-btn" data-who="Sofía">Sofía</button>
-      <button class="who-btn" data-who="La Güera">La Güera</button>
-    </div>
-    <div class="um-row">
-      <button class="um-cancel" id="who-modal-cancel">Cancelar</button>
-    </div>
-  </div>
-</div>
-
 <!-- Modal: lugar + descripción al subir -->
 <div class="upload-modal-overlay" id="upload-modal-overlay">
   <div class="upload-modal">
@@ -848,6 +826,7 @@
 
 <script src="https://cdn.jsdelivr.net/npm/exif-js@2.3.0/exif.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="/auth.js"></script>
 <script>
   const SUPABASE_URL = "https://jgxzbnpbhbrrsedjmnbm.supabase.co";
   const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpneHpibnBiaGJycnNlZGptbmJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzMjkzMzksImV4cCI6MjA5NzkwNTMzOX0.PHAVOJYURjM0PP0_Otxa5rn1-Xc-hRhxkB6wWatp4MM";
@@ -866,19 +845,8 @@
     { title: "Cenas abiertas", prefix: "dinner" },
   ];
 
-  let whoAmI = localStorage.getItem("nyc-trip-who") || null;
-  function setWho(name){
-    whoAmI = name;
-    localStorage.setItem("nyc-trip-who", name);
-    document.querySelectorAll(".who-btn").forEach(b=>{
-      b.classList.toggle("active", b.dataset.who === name);
-    });
-    document.getElementById("send-btn").disabled = !(whoAmI && document.getElementById("msg-input").value.trim());
-  }
-  document.querySelectorAll(".who-btn").forEach(btn=>{
-    btn.addEventListener("click", ()=> setWho(btn.dataset.who));
-  });
-  if (whoAmI) setWho(whoAmI);
+  // La identidad ya la da el login (auth.js) en window.GOTI_USER — MGR/GTD/SGT/EGT
+  document.getElementById("send-btn").disabled = !document.getElementById("msg-input").value.trim();
 
   // ---------- Checklist ----------
   function renderChecklist(rows){
@@ -914,7 +882,7 @@
 
   async function toggleCheck(item){
     const nextDone = !item.done;
-    const who = whoAmI || "alguien";
+    const who = window.GOTI_USER || "alguien";
     const { error } = await sb.from("trip_checklist")
       .update({ done: nextDone, updated_by: who, updated_at: new Date().toISOString() })
       .eq("id", item.id);
@@ -976,16 +944,16 @@
   const msgInput = document.getElementById("msg-input");
   const sendBtn = document.getElementById("send-btn");
   msgInput.addEventListener("input", ()=>{
-    sendBtn.disabled = !(whoAmI && msgInput.value.trim());
+    sendBtn.disabled = !msgInput.value.trim();
   });
   sendBtn.addEventListener("click", async ()=>{
     const message = msgInput.value.trim();
-    if(!whoAmI || !message) return;
+    if(!message) return;
     sendBtn.disabled = true;
     sendBtn.textContent = "Enviando…";
     const dayKey = document.getElementById("day-tag").value;
     const { error } = await sb.from("trip_suggestions").insert({
-      day_key: dayKey, author: whoAmI, message, trip_key: TRIP_KEY
+      day_key: dayKey, author: window.GOTI_USER, message, trip_key: TRIP_KEY
     });
     sendBtn.textContent = "Enviar";
     if(error){ console.error(error); sendBtn.disabled = false; return; }
@@ -1028,29 +996,7 @@
   const umSubmitBtn = document.getElementById("um-submit");
 
   document.querySelectorAll(".upload-btn").forEach(btn=>{
-    btn.addEventListener("click", ()=>{
-      if(!whoAmI){
-        pendingUploadBtn = btn;
-        whoModalOverlay.classList.add("open");
-        return;
-      }
-      document.getElementById("file-" + btn.dataset.day).click();
-    });
-  });
-
-  let pendingUploadBtn = null;
-  const whoModalOverlay = document.getElementById("who-modal-overlay");
-  document.querySelectorAll("#who-modal-buttons .who-btn").forEach(b=>{
-    b.addEventListener("click", ()=>{
-      setWho(b.dataset.who);
-      whoModalOverlay.classList.remove("open");
-      if(pendingUploadBtn) document.getElementById("file-" + pendingUploadBtn.dataset.day).click();
-      pendingUploadBtn = null;
-    });
-  });
-  document.getElementById("who-modal-cancel").addEventListener("click", ()=>{
-    whoModalOverlay.classList.remove("open");
-    pendingUploadBtn = null;
+    btn.addEventListener("click", ()=> document.getElementById("file-" + btn.dataset.day).click());
   });
 
   function getExifDate(exifData){
@@ -1103,7 +1049,7 @@
       const files = Array.from(e.target.files);
       if(!files.length) return;
       const status = document.getElementById("status-" + dayId);
-      const author = whoAmI || "alguien";
+      const author = window.GOTI_USER || "alguien";
       let done = 0;
       for(const file of files){
         status.textContent = `Subiendo ${done+1}/${files.length}… adivinando fecha y lugar`;
