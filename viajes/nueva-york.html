@@ -815,6 +815,22 @@
   </div>
 </div>
 
+<!-- Modal: quién eres (antes de subir) -->
+<div class="upload-modal-overlay" id="who-modal-overlay">
+  <div class="upload-modal">
+    <h4>¿Quién sube esta foto/video?</h4>
+    <div class="who-picker" id="who-modal-buttons" style="margin-bottom:14px;">
+      <button class="who-btn" data-who="Manuel">Manuel</button>
+      <button class="who-btn" data-who="Gaby">Gaby</button>
+      <button class="who-btn" data-who="Sofía">Sofía</button>
+      <button class="who-btn" data-who="La Güera">La Güera</button>
+    </div>
+    <div class="um-row">
+      <button class="um-cancel" id="who-modal-cancel">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <!-- Modal: lugar + descripción al subir -->
 <div class="upload-modal-overlay" id="upload-modal-overlay">
   <div class="upload-modal">
@@ -1012,7 +1028,29 @@
   const umSubmitBtn = document.getElementById("um-submit");
 
   document.querySelectorAll(".upload-btn").forEach(btn=>{
-    btn.addEventListener("click", ()=> document.getElementById("file-" + btn.dataset.day).click());
+    btn.addEventListener("click", ()=>{
+      if(!whoAmI){
+        pendingUploadBtn = btn;
+        whoModalOverlay.classList.add("open");
+        return;
+      }
+      document.getElementById("file-" + btn.dataset.day).click();
+    });
+  });
+
+  let pendingUploadBtn = null;
+  const whoModalOverlay = document.getElementById("who-modal-overlay");
+  document.querySelectorAll("#who-modal-buttons .who-btn").forEach(b=>{
+    b.addEventListener("click", ()=>{
+      setWho(b.dataset.who);
+      whoModalOverlay.classList.remove("open");
+      if(pendingUploadBtn) document.getElementById("file-" + pendingUploadBtn.dataset.day).click();
+      pendingUploadBtn = null;
+    });
+  });
+  document.getElementById("who-modal-cancel").addEventListener("click", ()=>{
+    whoModalOverlay.classList.remove("open");
+    pendingUploadBtn = null;
   });
 
   function getExifDate(exifData){
@@ -1115,6 +1153,7 @@
     if(error) console.error(error);
     pendingEdit = null;
     await loadMemories();
+    if(lbDayId) lbItems = memoriesByDay[lbDayId] || [];
     if(lightbox.classList.contains("open")){ renderLightbox(); }
   });
 
@@ -1137,7 +1176,7 @@
   }
 
   // ---------- Lightbox: navegar como fototeca ----------
-  let lbItems = [], lbIndex = 0;
+  let lbItems = [], lbIndex = 0, lbDayId = null;
   const lightbox = document.getElementById("lightbox");
   const lbMedia = document.getElementById("lb-media");
   const lbMeta = document.getElementById("lb-meta");
@@ -1163,6 +1202,7 @@
   }
 
   function openLightbox(dayId, idx){
+    lbDayId = dayId;
     lbItems = memoriesByDay[dayId] || [];
     lbIndex = idx;
     if(!lbItems.length) return;
