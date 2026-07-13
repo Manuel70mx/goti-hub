@@ -214,7 +214,7 @@
   .recuerdos-content .story{ font-size:13.5px; color:var(--ink-soft); line-height:1.55; margin:0 0 10px; }
   .recuerdos-content .pending{ font-size:12.5px; color:var(--ink-faint); font-style:italic; margin:0 0 10px; }
   .rgrid{ display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-bottom:10px; }
-  .rgrid a, .rgrid .vwrap{ position:relative; display:block; aspect-ratio:1/1; border-radius:8px; overflow:hidden; background:var(--paper-2); }
+  .rgrid .gcell{ position:relative; display:block; aspect-ratio:1/1; border-radius:8px; overflow:hidden; background:var(--paper-2); }
   .rgrid img{ width:100%; height:100%; object-fit:cover; display:block; }
   .rgrid video{ width:100%; height:100%; object-fit:cover; display:block; background:#000; }
   .rgrid .vbadge{ position:absolute; bottom:4px; right:4px; background:rgba(0,0,0,.55); color:#fff; font-size:9px; padding:1px 5px; border-radius:5px; font-family:'IBM Plex Mono',monospace; pointer-events:none; }
@@ -248,6 +248,12 @@
   }
   .lightbox .lb-prev{ left:10px; } .lightbox .lb-next{ right:10px; }
   .lightbox .lb-count{ font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-faint); color:#8A8266; margin-top:8px; }
+  .lightbox .lb-actions{ display:flex; gap:10px; margin-top:12px; }
+  .lightbox .lb-action-btn{
+    font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:11.5px; padding:7px 14px; border-radius:99px;
+    border:1.5px solid rgba(243,236,217,.3); background:transparent; color:var(--paper); cursor:pointer;
+  }
+  .lightbox .lb-action-btn.danger{ border-color:#e0665c; color:#ff8f85; }
 
   /* ---------- Modal: lugar + descripción al subir ---------- */
   .upload-modal-overlay{
@@ -802,6 +808,10 @@
     <div class="lb-meta" id="lb-meta"></div>
     <div class="lb-caption" id="lb-caption"></div>
     <div class="lb-count" id="lb-count"></div>
+    <div class="lb-actions">
+      <button class="lb-action-btn" id="lb-edit">✎ Editar</button>
+      <button class="lb-action-btn danger" id="lb-delete">🗑 Eliminar</button>
+    </div>
   </div>
 </div>
 
@@ -993,10 +1003,13 @@
   });
 
   // ---------- Recuerdos: fotos y videos ----------
-  let pendingUpload = null; // { dayId, files }
+  let pendingUpload = null; // { dayId, files, input }
+  let pendingEdit = null;   // memoria existente que se está editando
   const modalOverlay = document.getElementById("upload-modal-overlay");
   const umLocation = document.getElementById("um-location");
   const umCaption = document.getElementById("um-caption");
+  const umTitle = document.querySelector(".upload-modal h4");
+  const umSubmitBtn = document.getElementById("um-submit");
 
   document.querySelectorAll(".upload-btn").forEach(btn=>{
     btn.addEventListener("click", ()=> document.getElementById("file-" + btn.dataset.day).click());
@@ -1007,7 +1020,10 @@
       const dayId = input.id.replace("file-", "");
       const files = Array.from(e.target.files);
       if(!files.length) return;
+      pendingEdit = null;
       pendingUpload = { dayId, files, input };
+      umTitle.textContent = "Cuéntanos de esta foto/video";
+      umSubmitBtn.textContent = "Subir";
       umLocation.value = ""; umCaption.value = "";
       modalOverlay.classList.add("open");
       setTimeout(()=> umLocation.focus(), 50);
@@ -1016,15 +1032,27 @@
 
   document.getElementById("um-cancel").addEventListener("click", ()=>{
     if(pendingUpload) pendingUpload.input.value = "";
-    pendingUpload = null;
+    pendingUpload = null; pendingEdit = null;
     modalOverlay.classList.remove("open");
   });
 
   document.getElementById("um-submit").addEventListener("click", async ()=>{
-    if(!pendingUpload) return;
-    const { dayId, files, input } = pendingUpload;
     const location = umLocation.value.trim();
     const caption = umCaption.value.trim();
+
+    if(pendingEdit){
+      modalOverlay.classList.remove("open");
+      const { error } = await sb.from("trip_memories").update({ location, caption }).eq("id", pendingEdit.id);
+      if(error) console.error(error);
+      pendingEdit = null;
+      await loadMemories();
+      // refrescar lo que se ve en el visor si sigue abierto
+      if(lightbox.classList.contains("open")){ renderLightbox(); }
+      return;
+    }
+
+    if(!pendingUpload) return;
+    const { dayId, files, input } = pendingUpload;
     modalOverlay.classList.remove("open");
     const status = document.getElementById("status-" + dayId);
     const author = whoAmI || "alguien";
@@ -1038,7 +1066,7 @@
         if(upErr) throw upErr;
         const { data: urlData } = sb.storage.from("recuerdos").getPublicUrl(path);
         const mediaType = file.type.startsWith("video/") ? "video" : "image";
-        await sb.from("trip_memories").insert({ trip_key: TRIP_KEY, day_key: dayId, media_url: urlData.publicUrl, media_type: mediaType, author, location, caption });
+        await sb.from("trip_memories").insert({ trip_key: TRIP_KEY, day_key: dayId, media_url: urlData.publicUrl, storage_path: path, media_type: mediaType, author, location, caption });
         done++;
       }catch(err){
         console.error(err);
@@ -1059,13 +1087,11 @@
     if(!grid) return;
     grid.innerHTML = "";
     items.forEach((m, idx)=>{
-      let el;
+      const el = document.createElement("div");
+      el.className = "gcell";
       if(m.media_type === "video"){
-        el = document.createElement("div");
-        el.className = "vwrap";
         el.innerHTML = `<video src="${m.media_url}" playsinline muted></video><span class="vbadge">VIDEO</span>`;
       } else {
-        el = document.createElement("div");
         el.innerHTML = `<img src="${m.media_url}" loading="lazy">`;
       }
       el.style.cursor = "pointer";
@@ -1118,6 +1144,37 @@
   document.getElementById("lb-next").addEventListener("click", lbNext);
   document.getElementById("lb-prev").addEventListener("click", lbPrev);
   lightbox.addEventListener("click", (e)=>{ if(e.target === lightbox) closeLightbox(); });
+
+  document.getElementById("lb-edit").addEventListener("click", (e)=>{
+    e.stopPropagation();
+    const m = lbItems[lbIndex];
+    if(!m) return;
+    pendingUpload = null;
+    pendingEdit = m;
+    umTitle.textContent = "Editar foto/video";
+    umSubmitBtn.textContent = "Guardar";
+    umLocation.value = m.location || "";
+    umCaption.value = m.caption || "";
+    modalOverlay.classList.add("open");
+    setTimeout(()=> umLocation.focus(), 50);
+  });
+
+  document.getElementById("lb-delete").addEventListener("click", async (e)=>{
+    e.stopPropagation();
+    const m = lbItems[lbIndex];
+    if(!m) return;
+    if(!confirm("¿Eliminar esta foto/video? No se puede deshacer.")) return;
+    try{
+      if(m.storage_path){
+        await sb.storage.from("recuerdos").remove([m.storage_path]);
+      }
+      await sb.from("trip_memories").delete().eq("id", m.id);
+      await loadMemories();
+      lbItems = lbItems.filter(x=> x.id !== m.id);
+      if(!lbItems.length){ closeLightbox(); }
+      else { lbIndex = Math.min(lbIndex, lbItems.length - 1); renderLightbox(); }
+    }catch(err){ console.error(err); alert("No se pudo eliminar, intenta de nuevo."); }
+  });
   document.addEventListener("keydown", (e)=>{
     if(!lightbox.classList.contains("open")) return;
     if(e.key === "Escape") closeLightbox();
