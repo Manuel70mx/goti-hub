@@ -1056,10 +1056,13 @@
   function getExifDate(exifData){
     const raw = exifData?.DateTimeOriginal || exifData?.DateTime;
     if(!raw) return null;
-    // formato EXIF: "2026:07:08 11:32:05"
+    // formato EXIF: "2026:07:08 11:32:05" — sin huso horario.
+    // Asumimos que se tomó en Nueva York (Eastern, UTC-4 en julio) sin importar
+    // el huso del celular que sube la foto.
     const m = String(raw).match(/(\d{4}):(\d{2}):(\d{2}) (\d{2}):(\d{2}):(\d{2})/);
     if(!m) return null;
-    return new Date(`${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:${m[6]}`).toISOString();
+    const iso = `${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:${m[6]}-04:00`;
+    return new Date(iso).toISOString();
   }
 
   function getExifGPS(exifData){
@@ -1184,7 +1187,7 @@
   const lbCount = document.getElementById("lb-count");
 
   function fmtWhen(iso){
-    return new Date(iso).toLocaleString("es-MX", { weekday:"short", day:"2-digit", month:"short", hour:"2-digit", minute:"2-digit" });
+    return new Date(iso).toLocaleString("es-MX", { timeZone:"America/New_York", weekday:"short", day:"2-digit", month:"short", hour:"2-digit", minute:"2-digit" });
   }
 
   function renderLightbox(){
