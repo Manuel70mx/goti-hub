@@ -1004,11 +1004,29 @@
     if(!raw) return null;
     // formato EXIF: "2026:07:08 11:32:05" — sin huso horario.
     // Asumimos que se tomó en Nueva York (Eastern, UTC-4 en julio) sin importar
-    // el huso del celular que sube la foto.
+    // el huso del celular que sube la foto. OJO: esto puede fallar si el celular
+    // aún no había cambiado de huso (p.ej. minutos después de aterrizar) —
+    // por eso getExifGPSDateTime() de abajo es la fuente preferida cuando existe.
     const m = String(raw).match(/(\d{4}):(\d{2}):(\d{2}) (\d{2}):(\d{2}):(\d{2})/);
     if(!m) return null;
     const iso = `${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:${m[6]}-04:00`;
     return new Date(iso).toISOString();
+  }
+
+  // GPSDateStamp + GPSTimeStamp son SIEMPRE UTC real (a diferencia del reloj de
+  // la cámara, que puede estar en el huso equivocado). Fuente preferida cuando existe.
+  function getExifGPSDateTime(exifData){
+    const dateStamp = exifData?.GPSDateStamp;
+    const timeStamp = exifData?.GPSTimeStamp;
+    if(!dateStamp || !timeStamp || !Array.isArray(timeStamp) || timeStamp.length < 3) return null;
+    const dm = String(dateStamp).match(/(\d{4}):(\d{2}):(\d{2})/);
+    if(!dm) return null;
+    const hh = Math.floor(Number(timeStamp[0]) || 0);
+    const mm = Math.floor(Number(timeStamp[1]) || 0);
+    const ss = Math.floor(Number(timeStamp[2]) || 0);
+    const iso = `${dm[1]}-${dm[2]}-${dm[3]}T${String(hh).padStart(2,"0")}:${String(mm).padStart(2,"0")}:${String(ss).padStart(2,"0")}Z`;
+    const d = new Date(iso);
+    return isNaN(d.getTime()) ? null : d.toISOString();
   }
 
   function getExifGPS(exifData){
@@ -1056,7 +1074,7 @@
         try{
           // 1) Intentar leer EXIF (fecha + GPS) de la foto
           const exifData = await readExif(file);
-          const takenAt = getExifDate(exifData);
+          const takenAt = getExifGPSDateTime(exifData) || getExifDate(exifData);
           const gps = getExifGPS(exifData);
           let guessedLocation = null;
           if(gps) guessedLocation = await reverseGeocode(gps.latitude, gps.longitude);
