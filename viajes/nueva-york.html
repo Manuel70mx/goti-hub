@@ -815,6 +815,7 @@
     <h4>Cuéntanos de esta foto/video</h4>
     <label>Lugar</label>
     <input type="text" id="um-location" placeholder="Ej. Katz's Delicatessen">
+    <button type="button" id="um-reuse-location" style="display:none; font-family:'IBM Plex Mono',monospace; font-size:11px; padding:5px 10px; border-radius:99px; border:1.5px solid var(--rule); background:var(--paper); color:var(--ink-soft); cursor:pointer; margin:-8px 0 12px;"></button>
     <label>Qué es</label>
     <input type="text" id="um-caption" placeholder="Ej. El pastrami de Manuel">
     <label id="um-date-label" style="display:none;">Fecha y hora (hora de Nueva York)</label>
@@ -998,6 +999,13 @@
   const umSubmitBtn = document.getElementById("um-submit");
   const umDateLabel = document.getElementById("um-date-label");
   const umDate = document.getElementById("um-date");
+  const umReuseBtn = document.getElementById("um-reuse-location");
+  function getLastLocation(){ return localStorage.getItem("goti-last-location") || null; }
+  function setLastLocation(loc){ if(loc) localStorage.setItem("goti-last-location", loc); }
+  umReuseBtn.addEventListener("click", ()=>{
+    umLocation.value = getLastLocation() || "";
+    umLocation.focus();
+  });
 
   // convierte un ISO (UTC) al valor que necesita un <input type=datetime-local>,
   // pero mostrando la hora de Nueva York (no la del dispositivo)
@@ -1163,6 +1171,7 @@
     pendingEdit = null;
     umDateLabel.style.display = "none";
     umDate.style.display = "none";
+    umReuseBtn.style.display = "none";
     modalOverlay.classList.remove("open");
   });
 
@@ -1172,6 +1181,7 @@
     if(!pendingEdit) return;
     const takenAt = nyLocalInputValueToISO(umDate.value) || pendingEdit.taken_at;
     modalOverlay.classList.remove("open");
+    if(location) setLastLocation(location);
     const { error } = await sb.from("trip_memories").update({ location, caption, taken_at: takenAt }).eq("id", pendingEdit.id);
     if(error) console.error(error);
     pendingEdit = null;
@@ -1256,6 +1266,13 @@
     umDateLabel.style.display = "block";
     umDate.style.display = "block";
     umDate.value = isoToNYLocalInputValue(m.taken_at || m.created_at);
+    const lastLoc = getLastLocation();
+    if(lastLoc && lastLoc !== (m.location || "")){
+      umReuseBtn.textContent = `📍 Usar: ${lastLoc}`;
+      umReuseBtn.style.display = "inline-block";
+    } else {
+      umReuseBtn.style.display = "none";
+    }
     modalOverlay.classList.add("open");
     setTimeout(()=> umLocation.focus(), 50);
   });
