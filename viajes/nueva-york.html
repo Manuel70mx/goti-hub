@@ -817,6 +817,8 @@
     <input type="text" id="um-location" placeholder="Ej. Katz's Delicatessen">
     <label>Qué es</label>
     <input type="text" id="um-caption" placeholder="Ej. El pastrami de Manuel">
+    <label id="um-date-label" style="display:none;">Fecha y hora (hora de Nueva York)</label>
+    <input type="datetime-local" id="um-date" style="display:none;">
     <div class="um-row">
       <button class="um-cancel" id="um-cancel">Cancelar</button>
       <button class="um-submit" id="um-submit">Subir</button>
@@ -994,6 +996,26 @@
   const umCaption = document.getElementById("um-caption");
   const umTitle = document.querySelector(".upload-modal h4");
   const umSubmitBtn = document.getElementById("um-submit");
+  const umDateLabel = document.getElementById("um-date-label");
+  const umDate = document.getElementById("um-date");
+
+  // convierte un ISO (UTC) al valor que necesita un <input type=datetime-local>,
+  // pero mostrando la hora de Nueva York (no la del dispositivo)
+  function isoToNYLocalInputValue(iso){
+    if(!iso) return "";
+    const parts = new Intl.DateTimeFormat("en-CA", {
+      timeZone:"America/New_York", year:"numeric", month:"2-digit", day:"2-digit",
+      hour:"2-digit", minute:"2-digit", hour12:false
+    }).formatToParts(new Date(iso));
+    const get = t => parts.find(p=>p.type===t)?.value;
+    return `${get("year")}-${get("month")}-${get("day")}T${get("hour")}:${get("minute")}`;
+  }
+  // convierte el valor de un <input type=datetime-local> (interpretado como hora
+  // de Nueva York) de vuelta a un ISO en UTC para guardar
+  function nyLocalInputValueToISO(val){
+    if(!val) return null;
+    return new Date(`${val}:00-04:00`).toISOString();
+  }
 
   document.querySelectorAll(".upload-btn").forEach(btn=>{
     btn.addEventListener("click", ()=> document.getElementById("file-" + btn.dataset.day).click());
@@ -1075,7 +1097,27 @@
           const takenAt = getExifGPSDateTime(exifData) || getExifDate(exifData);
           const gps = getExifGPS(exifData);
           let guessedLocation = null;
-          if(gps) guessedLocation = await reverseGeocode(gps.latitude, gps.longitude);
+          let geocodeError = null;
+          if(gps){
+            try{ guessedLocation = await reverseGeocode(gps.latitude, gps.longitude); }
+            catch(ge){ geocodeError = String(ge); }
+          }
+          const debugInfo = {
+            fileType: file.type,
+            hasGPS: !!gps,
+            gps: gps || null,
+            rawGPSLatitude: exifData?.GPSLatitude || null,
+            rawGPSLongitude: exifData?.GPSLongitude || null,
+            rawGPSLatitudeRef: exifData?.GPSLatitudeRef || null,
+            rawGPSLongitudeRef: exifData?.GPSLongitudeRef || null,
+            dateTimeOriginal: exifData?.DateTimeOriginal || null,
+            gpsDateStamp: exifData?.GPSDateStamp || null,
+            gpsTimeStamp: exifData?.GPSTimeStamp || null,
+            takenAtComputed: takenAt,
+            guessedLocation,
+            geocodeError,
+            allExifKeys: Object.keys(exifData || {})
+          };
 
           // 2) Subir el archivo
           const ext = file.name.split(".").pop();
@@ -1088,7 +1130,8 @@
           // 3) Guardar con lo que se pudo adivinar (queda editable después)
           await sb.from("trip_memories").insert({
             trip_key: TRIP_KEY, day_key: dayId, media_url: urlData.publicUrl, storage_path: path,
-            media_type: mediaType, author, location: guessedLocation, caption: null, taken_at: takenAt
+            media_type: mediaType, author, location: guessedLocation, caption: null, taken_at: takenAt,
+            debug_exif: debugInfo
           });
           done++;
         }catch(err){
@@ -1106,6 +1149,8 @@
 
   document.getElementById("um-cancel").addEventListener("click", ()=>{
     pendingEdit = null;
+    umDateLabel.style.display = "none";
+    umDate.style.display = "none";
     modalOverlay.classList.remove("open");
   });
 
@@ -1113,8 +1158,9 @@
     const location = umLocation.value.trim();
     const caption = umCaption.value.trim();
     if(!pendingEdit) return;
+    const takenAt = nyLocalInputValueToISO(umDate.value) || pendingEdit.taken_at;
     modalOverlay.classList.remove("open");
-    const { error } = await sb.from("trip_memories").update({ location, caption }).eq("id", pendingEdit.id);
+    const { error } = await sb.from("trip_memories").update({ location, caption, taken_at: takenAt }).eq("id", pendingEdit.id);
     if(error) console.error(error);
     pendingEdit = null;
     await loadMemories();
@@ -1195,6 +1241,9 @@
     umSubmitBtn.textContent = "Guardar";
     umLocation.value = m.location || "";
     umCaption.value = m.caption || "";
+    umDateLabel.style.display = "block";
+    umDate.style.display = "block";
+    umDate.value = isoToNYLocalInputValue(m.taken_at || m.created_at);
     modalOverlay.classList.add("open");
     setTimeout(()=> umLocation.focus(), 50);
   });
