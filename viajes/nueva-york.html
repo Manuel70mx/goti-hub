@@ -1041,12 +1041,10 @@
 
   async function reverseGeocode(lat, lon){
     try{
-      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=17`, {
-        headers: { "Accept-Language": "es" }
-      });
+      const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=es`);
+      if(!res.ok) return null;
       const data = await res.json();
-      const a = data.address || {};
-      return a.amenity || a.shop || a.building || a.road || a.neighbourhood || a.suburb || null;
+      return data.locality || data.city || data.principalSubdivision || null;
     }catch(e){ return null; }
   }
 
