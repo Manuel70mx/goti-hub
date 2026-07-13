@@ -226,6 +226,50 @@
   .upload-status{ font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-faint); }
   input[type=file]{ display:none; }
 
+  /* ---------- Lightbox tipo fototeca ---------- */
+  .lightbox{
+    position:fixed; inset:0; background:rgba(10,14,24,.96); z-index:200;
+    display:none; flex-direction:column; align-items:center; justify-content:center;
+  }
+  .lightbox.open{ display:flex; }
+  .lightbox .lb-media{ max-width:100%; max-height:72vh; display:flex; align-items:center; justify-content:center; }
+  .lightbox .lb-media img, .lightbox .lb-media video{ max-width:100%; max-height:72vh; object-fit:contain; border-radius:6px; }
+  .lightbox .lb-info{
+    color:var(--paper); text-align:center; padding:14px 20px 0; max-width:520px;
+  }
+  .lightbox .lb-meta{ font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:#C9B98A; margin-bottom:4px; }
+  .lightbox .lb-caption{ font-size:14px; color:var(--paper); }
+  .lightbox .lb-close{
+    position:absolute; top:16px; right:18px; color:var(--paper); font-size:26px; background:none; border:none; cursor:pointer;
+  }
+  .lightbox .lb-nav{
+    position:absolute; top:50%; transform:translateY(-50%); background:rgba(255,255,255,.1); border:none; color:var(--paper);
+    font-size:26px; width:44px; height:44px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center;
+  }
+  .lightbox .lb-prev{ left:10px; } .lightbox .lb-next{ right:10px; }
+  .lightbox .lb-count{ font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-faint); color:#8A8266; margin-top:8px; }
+
+  /* ---------- Modal: lugar + descripción al subir ---------- */
+  .upload-modal-overlay{
+    position:fixed; inset:0; background:rgba(18,32,61,.55); z-index:210;
+    display:none; align-items:flex-end; justify-content:center;
+  }
+  .upload-modal-overlay.open{ display:flex; }
+  .upload-modal{
+    background:var(--card); border-radius:18px 18px 0 0; padding:18px 18px 24px; width:100%; max-width:520px;
+    box-shadow:0 -8px 30px rgba(18,32,61,.3);
+  }
+  .upload-modal h4{ font-family:'Archivo',sans-serif; font-weight:800; font-size:15px; margin:0 0 12px; }
+  .upload-modal label{ font-family:'IBM Plex Mono',monospace; font-size:10.5px; text-transform:uppercase; color:var(--ink-faint); display:block; margin-bottom:4px; }
+  .upload-modal input[type=text]{
+    width:100%; border:1.5px solid var(--rule); border-radius:10px; padding:9px 11px; font-family:'Inter'; font-size:14px;
+    background:var(--paper); color:var(--ink); margin-bottom:12px;
+  }
+  .upload-modal .um-row{ display:flex; gap:8px; justify-content:flex-end; }
+  .upload-modal button{ font-family:'Archivo',sans-serif; font-weight:800; font-size:13px; padding:9px 16px; border-radius:10px; border:none; cursor:pointer; }
+  .upload-modal .um-cancel{ background:transparent; color:var(--ink-soft); }
+  .upload-modal .um-submit{ background:var(--ink); color:var(--paper); }
+
   /* ---------- Checklist ---------- */
   .check-group{margin-bottom:18px;}
   .check-group-title{font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-faint); margin-bottom:8px;}
@@ -748,6 +792,34 @@
   Hecho para la familia González Tiscareño · se actualiza en vivo para todos
 </footer>
 
+<!-- Lightbox tipo fototeca -->
+<div class="lightbox" id="lightbox">
+  <button class="lb-close" id="lb-close">×</button>
+  <button class="lb-nav lb-prev" id="lb-prev">‹</button>
+  <div class="lb-media" id="lb-media"></div>
+  <button class="lb-nav lb-next" id="lb-next">›</button>
+  <div class="lb-info">
+    <div class="lb-meta" id="lb-meta"></div>
+    <div class="lb-caption" id="lb-caption"></div>
+    <div class="lb-count" id="lb-count"></div>
+  </div>
+</div>
+
+<!-- Modal: lugar + descripción al subir -->
+<div class="upload-modal-overlay" id="upload-modal-overlay">
+  <div class="upload-modal">
+    <h4>Cuéntanos de esta foto/video</h4>
+    <label>Lugar</label>
+    <input type="text" id="um-location" placeholder="Ej. Katz's Delicatessen">
+    <label>Qué es</label>
+    <input type="text" id="um-caption" placeholder="Ej. El pastrami de Manuel">
+    <div class="um-row">
+      <button class="um-cancel" id="um-cancel">Cancelar</button>
+      <button class="um-submit" id="um-submit">Subir</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <script>
   const SUPABASE_URL = "https://jgxzbnpbhbrrsedjmnbm.supabase.co";
@@ -921,66 +993,156 @@
   });
 
   // ---------- Recuerdos: fotos y videos ----------
+  let pendingUpload = null; // { dayId, files }
+  const modalOverlay = document.getElementById("upload-modal-overlay");
+  const umLocation = document.getElementById("um-location");
+  const umCaption = document.getElementById("um-caption");
+
   document.querySelectorAll(".upload-btn").forEach(btn=>{
     btn.addEventListener("click", ()=> document.getElementById("file-" + btn.dataset.day).click());
   });
 
   document.querySelectorAll('input[type=file][id^="file-d"]').forEach(input=>{
-    input.addEventListener("change", async (e)=>{
+    input.addEventListener("change", (e)=>{
       const dayId = input.id.replace("file-", "");
-      const status = document.getElementById("status-" + dayId);
       const files = Array.from(e.target.files);
       if(!files.length) return;
-      const author = whoAmI || "alguien";
-      let done = 0;
-      for(const file of files){
-        status.textContent = `Subiendo ${done+1}/${files.length}…`;
-        try{
-          const ext = file.name.split(".").pop();
-          const path = `${dayId}/${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext}`;
-          const { error: upErr } = await sb.storage.from("recuerdos").upload(path, file, { contentType: file.type, upsert:false });
-          if(upErr) throw upErr;
-          const { data: urlData } = sb.storage.from("recuerdos").getPublicUrl(path);
-          const mediaType = file.type.startsWith("video/") ? "video" : "image";
-          await sb.from("trip_memories").insert({ trip_key: TRIP_KEY, day_key: dayId, media_url: urlData.publicUrl, media_type: mediaType, author });
-          done++;
-        }catch(err){
-          console.error(err);
-          status.textContent = "Error al subir";
-          return;
-        }
-      }
-      status.textContent = `✓ ${done} subido(s)`;
-      setTimeout(()=> status.textContent = "", 2500);
-      input.value = "";
-      loadMemories();
+      pendingUpload = { dayId, files, input };
+      umLocation.value = ""; umCaption.value = "";
+      modalOverlay.classList.add("open");
+      setTimeout(()=> umLocation.focus(), 50);
     });
+  });
+
+  document.getElementById("um-cancel").addEventListener("click", ()=>{
+    if(pendingUpload) pendingUpload.input.value = "";
+    pendingUpload = null;
+    modalOverlay.classList.remove("open");
+  });
+
+  document.getElementById("um-submit").addEventListener("click", async ()=>{
+    if(!pendingUpload) return;
+    const { dayId, files, input } = pendingUpload;
+    const location = umLocation.value.trim();
+    const caption = umCaption.value.trim();
+    modalOverlay.classList.remove("open");
+    const status = document.getElementById("status-" + dayId);
+    const author = whoAmI || "alguien";
+    let done = 0;
+    for(const file of files){
+      status.textContent = `Subiendo ${done+1}/${files.length}…`;
+      try{
+        const ext = file.name.split(".").pop();
+        const path = `${dayId}/${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext}`;
+        const { error: upErr } = await sb.storage.from("recuerdos").upload(path, file, { contentType: file.type, upsert:false });
+        if(upErr) throw upErr;
+        const { data: urlData } = sb.storage.from("recuerdos").getPublicUrl(path);
+        const mediaType = file.type.startsWith("video/") ? "video" : "image";
+        await sb.from("trip_memories").insert({ trip_key: TRIP_KEY, day_key: dayId, media_url: urlData.publicUrl, media_type: mediaType, author, location, caption });
+        done++;
+      }catch(err){
+        console.error(err);
+        status.textContent = "Error al subir";
+        pendingUpload = null;
+        return;
+      }
+    }
+    status.textContent = `✓ ${done} subido(s)`;
+    setTimeout(()=> status.textContent = "", 2500);
+    input.value = "";
+    pendingUpload = null;
+    loadMemories();
   });
 
   function renderMemGrid(dayId, items){
     const grid = document.getElementById("grid-" + dayId);
     if(!grid) return;
     grid.innerHTML = "";
-    items.forEach(m=>{
+    items.forEach((m, idx)=>{
+      let el;
       if(m.media_type === "video"){
-        const wrap = document.createElement("div");
-        wrap.className = "vwrap";
-        wrap.innerHTML = `<video src="${m.media_url}" controls playsinline></video><span class="vbadge">VIDEO</span>`;
-        grid.appendChild(wrap);
+        el = document.createElement("div");
+        el.className = "vwrap";
+        el.innerHTML = `<video src="${m.media_url}" playsinline muted></video><span class="vbadge">VIDEO</span>`;
       } else {
-        const a = document.createElement("a");
-        a.href = m.media_url; a.target = "_blank";
-        a.innerHTML = `<img src="${m.media_url}" loading="lazy">`;
-        grid.appendChild(a);
+        el = document.createElement("div");
+        el.innerHTML = `<img src="${m.media_url}" loading="lazy">`;
       }
+      el.style.cursor = "pointer";
+      el.addEventListener("click", ()=> openLightbox(dayId, idx));
+      grid.appendChild(el);
     });
   }
+
+  // ---------- Lightbox: navegar como fototeca ----------
+  let lbItems = [], lbIndex = 0;
+  const lightbox = document.getElementById("lightbox");
+  const lbMedia = document.getElementById("lb-media");
+  const lbMeta = document.getElementById("lb-meta");
+  const lbCaption = document.getElementById("lb-caption");
+  const lbCount = document.getElementById("lb-count");
+
+  function fmtWhen(iso){
+    return new Date(iso).toLocaleString("es-MX", { weekday:"short", day:"2-digit", month:"short", hour:"2-digit", minute:"2-digit" });
+  }
+
+  function renderLightbox(){
+    const m = lbItems[lbIndex];
+    lbMedia.innerHTML = m.media_type === "video"
+      ? `<video src="${m.media_url}" controls playsinline autoplay></video>`
+      : `<img src="${m.media_url}">`;
+    const metaParts = [];
+    if(m.location) metaParts.push(m.location);
+    metaParts.push(fmtWhen(m.created_at));
+    if(m.author) metaParts.push(m.author);
+    lbMeta.textContent = metaParts.join(" · ");
+    lbCaption.textContent = m.caption || "";
+    lbCount.textContent = `${lbIndex+1} / ${lbItems.length}`;
+  }
+
+  function openLightbox(dayId, idx){
+    lbItems = memoriesByDay[dayId] || [];
+    lbIndex = idx;
+    if(!lbItems.length) return;
+    renderLightbox();
+    lightbox.classList.add("open");
+  }
+  function closeLightbox(){
+    lightbox.classList.remove("open");
+    lbMedia.innerHTML = "";
+  }
+  function lbNext(){ lbIndex = (lbIndex + 1) % lbItems.length; renderLightbox(); }
+  function lbPrev(){ lbIndex = (lbIndex - 1 + lbItems.length) % lbItems.length; renderLightbox(); }
+
+  document.getElementById("lb-close").addEventListener("click", closeLightbox);
+  document.getElementById("lb-next").addEventListener("click", lbNext);
+  document.getElementById("lb-prev").addEventListener("click", lbPrev);
+  lightbox.addEventListener("click", (e)=>{ if(e.target === lightbox) closeLightbox(); });
+  document.addEventListener("keydown", (e)=>{
+    if(!lightbox.classList.contains("open")) return;
+    if(e.key === "Escape") closeLightbox();
+    if(e.key === "ArrowRight") lbNext();
+    if(e.key === "ArrowLeft") lbPrev();
+  });
+  // swipe táctil
+  let touchStartX = null;
+  lightbox.addEventListener("touchstart", (e)=>{ touchStartX = e.touches[0].clientX; });
+  lightbox.addEventListener("touchend", (e)=>{
+    if(touchStartX === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if(dx > 50) lbPrev();
+    else if(dx < -50) lbNext();
+    touchStartX = null;
+  });
+
+  let memoriesByDay = {};
 
   async function loadMemories(){
     const { data, error } = await sb.from("trip_memories").select("*").eq("trip_key", TRIP_KEY).order("created_at", { ascending:true });
     if(error){ console.error(error); return; }
     const byDay = {};
     data.forEach(m=>{ (byDay[m.day_key] ||= []).push(m); });
+    memoriesByDay = byDay;
     Object.keys(byDay).forEach(dayId=> renderMemGrid(dayId, byDay[dayId]));
   }
 
