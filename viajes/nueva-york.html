@@ -198,6 +198,34 @@
     font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-faint);
   }
 
+  /* ---------- Título del día = disparador de Historia y Recuerdos ---------- */
+  .day-recuerdos{ margin:2px 0 10px; }
+  .day-recuerdos summary{
+    cursor:pointer; list-style:none; display:flex; align-items:center; gap:7px;
+  }
+  .day-recuerdos summary::-webkit-details-marker{ display:none; }
+  .day-recuerdos summary h3{ margin:0; }
+  .day-recuerdos summary::after{
+    content:"📷 historia y fotos ▸"; font-family:'IBM Plex Mono',monospace; font-size:10px; font-weight:600;
+    color:var(--ink-faint); margin-left:auto; white-space:nowrap;
+  }
+  .day-recuerdos[open] summary::after{ content:"📷 historia y fotos ▾"; }
+  .recuerdos-content{ margin-top:10px; padding-top:10px; border-top:1px dashed var(--rule); }
+  .recuerdos-content .story{ font-size:13.5px; color:var(--ink-soft); line-height:1.55; margin:0 0 10px; }
+  .recuerdos-content .pending{ font-size:12.5px; color:var(--ink-faint); font-style:italic; margin:0 0 10px; }
+  .rgrid{ display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-bottom:10px; }
+  .rgrid a, .rgrid .vwrap{ position:relative; display:block; aspect-ratio:1/1; border-radius:8px; overflow:hidden; background:var(--paper-2); }
+  .rgrid img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .rgrid video{ width:100%; height:100%; object-fit:cover; display:block; background:#000; }
+  .rgrid .vbadge{ position:absolute; bottom:4px; right:4px; background:rgba(0,0,0,.55); color:#fff; font-size:9px; padding:1px 5px; border-radius:5px; font-family:'IBM Plex Mono',monospace; pointer-events:none; }
+  .upload-row{ display:flex; align-items:center; gap:10px; }
+  .upload-btn{
+    font-family:'Archivo',sans-serif; font-weight:800; font-size:12px; padding:8px 13px; border-radius:10px;
+    border:1.5px dashed var(--dot-color, var(--ink-soft)); background:transparent; color:var(--ink-soft); cursor:pointer;
+  }
+  .upload-status{ font-family:'IBM Plex Mono',monospace; font-size:10.5px; color:var(--ink-faint); }
+  input[type=file]{ display:none; }
+
   /* ---------- Checklist ---------- */
   .check-group{margin-bottom:18px;}
   .check-group-title{font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-faint); margin-bottom:8px;}
@@ -291,7 +319,6 @@
       <a class="pill" href="#d8">MAR 14</a>
       <a class="pill" href="#reservaciones">✓ RESERVAS</a>
       <a class="pill" href="#buzon">💬 SUGERENCIAS</a>
-      <a class="pill" href="/viajes/recuerdos.html">📷 RECUERDOS</a>
     </div>
   </div>
 </div>
@@ -341,7 +368,19 @@
       <div class="stop-dot"></div>
       <div class="stop-card">
         <div class="stop-date">Martes 7 jul</div>
-        <h3>Llegada a Nueva York</h3>
+        <details class="day-recuerdos" id="d1-recuerdos">
+          <summary><h3>Llegada a Nueva York</h3></summary>
+          <div class="recuerdos-content">
+            <p class="story">Vuelo MTY → Atlanta → Newark. Aterrizaron ~5:53pm hora pico, car service al hotel, check-in en el San Carlos y cena ligera en Midtown East — directo a descansar del jet lag.</p>
+            
+            <div class="rgrid" id="grid-d1"></div>
+            <div class="upload-row">
+              <button class="upload-btn" data-day="d1">📷 Agregar foto/video</button>
+              <span class="upload-status" id="status-d1"></span>
+            </div>
+            <input type="file" id="file-d1" accept="image/*,video/*" multiple>
+          </div>
+        </details>
         <p><span class="tag">MTY</span> Salida de casa 4:30am → dejar la camioneta en iPark → vuelo AM978, 7:52am.</p>
         <p><span class="tag">EWR</span> Aterrizan ~5:53pm hora pico. Car service / UberXL pre-reservado al hotel (45–75 min, ~$90–110).</p>
         <p class="muted">Check-in San Carlos Hotel. Cena ligera y tranquila en Midtown East — sin planes grandes, jet lag primero.</p>
@@ -368,7 +407,19 @@
       <div class="stop-dot"></div>
       <div class="stop-card">
         <div class="stop-date">Miércoles 8 jul</div>
-        <h3>Flatiron, LES y Village</h3>
+        <details class="day-recuerdos" id="d2-recuerdos">
+          <summary><h3>Flatiron, LES y Village</h3></summary>
+          <div class="recuerdos-content">
+            <p class="story">Comida en Katz's antes de que se llenara. Tarde caminando Nolita → SoHo, de shopping (el pedido de la Güera). A las 4pm, The FRIENDS™ Experience en Flatiron. De regreso, parada en el LEGO Store de Rockefeller Center, casi enfrente del hotel. Joe's Pizza se quedó pendiente.</p>
+            
+            <div class="rgrid" id="grid-d2"></div>
+            <div class="upload-row">
+              <button class="upload-btn" data-day="d2">📷 Agregar foto/video</button>
+              <span class="upload-status" id="status-d2"></span>
+            </div>
+            <input type="file" id="file-d2" accept="image/*,video/*" multiple>
+          </div>
+        </details>
         <p><strong>Katz's Delicatessen</strong> (205 E Houston) — comida ~11:30am, antes de que se llene. El pastrami de Manuel, compartirlo entre varios.</p>
         <p class="muted">Tarde: Nolita → SoHo (shopping, el pedido de la Güera).</p>
         <p class="confirmed">Confirmado · The FRIENDS™ Experience, 4:00pm · 130 E 23rd St (Flatiron)</p>
@@ -397,7 +448,19 @@
       <div class="stop-dot"></div>
       <div class="stop-card">
         <div class="stop-date">Jueves 9 jul</div>
-        <h3>Memorial del 11S, Puente de Brooklyn y Chinatown</h3>
+        <details class="day-recuerdos" id="d3-recuerdos">
+          <summary><h3>Memorial del 11S, Puente de Brooklyn y Chinatown</h3></summary>
+          <div class="recuerdos-content">
+            <p class="story">Mañana en el Memorial y Museo del 11S. Después, caminata al Puente de Brooklyn — cruzarlo a pie, vistas del skyline — y de bajada salieron justo en el borde de Chinatown. Recorrieron Chinatown y Little Italy antes de la cena confirmada en Delmonico's, 8pm.</p>
+            
+            <div class="rgrid" id="grid-d3"></div>
+            <div class="upload-row">
+              <button class="upload-btn" data-day="d3">📷 Agregar foto/video</button>
+              <span class="upload-status" id="status-d3"></span>
+            </div>
+            <input type="file" id="file-d3" accept="image/*,video/*" multiple>
+          </div>
+        </details>
         <p><span class="tag">E</span> al World Trade Center: Memorial y Museo del 11S (CityPASS, entrada 12:00pm).</p>
         <p><strong>Puente de Brooklyn</strong> — cruzarlo a pie, vistas del skyline y el río. La entrada está muy cerca del 11S, y del lado de Manhattan desemboca justo en el borde de Chinatown.</p>
         <p>Chinatown y Little Italy a pie (el plan de Gaby) — llegan caminando directo desde el puente.</p>
@@ -425,7 +488,19 @@
       <div class="stop-dot"></div>
       <div class="stop-card">
         <div class="stop-date">Viernes 10 jul</div>
-        <h3>Midtown + teatro</h3>
+        <details class="day-recuerdos" id="d4-recuerdos">
+          <summary><h3>Midtown + teatro</h3></summary>
+          <div class="recuerdos-content">
+            <p class="story">Comida en el Grand Central Oyster Bar. Caminata por la Quinta Avenida hasta Rockefeller Center, donde se encontraron con el Fan Fest del Mundial. De ahí, descanso en el hotel antes del teatro — Times Square y Ellen's Stardust quedaron fuera del plan. En la noche, MJ The Musical en el Neil Simon Theatre.</p>
+            
+            <div class="rgrid" id="grid-d4"></div>
+            <div class="upload-row">
+              <button class="upload-btn" data-day="d4">📷 Agregar foto/video</button>
+              <span class="upload-status" id="status-d4"></span>
+            </div>
+            <input type="file" id="file-d4" accept="image/*,video/*" multiple>
+          </div>
+        </details>
         <p class="confirmed">Comida confirmada · Grand Central Oyster Bar, 1:00pm · 4 personas</p>
         <p>Tarde: Quinta Avenida → Rockefeller Center (se encontraron el Fan Fest del Mundial ahí) → descanso en el hotel.</p>
         <p class="muted">Times Square se movió al lunes 13 en la nochecita. Ellen's Stardust Diner queda fuera del plan — cena libre antes del teatro, sobre la marcha.</p>
@@ -451,7 +526,19 @@
       <div class="stop-dot"></div>
       <div class="stop-card">
         <div class="stop-date">Sábado 11 jul</div>
-        <h3>Uptown: museos y Central Park</h3>
+        <details class="day-recuerdos" id="d5-recuerdos">
+          <summary><h3>Uptown: museos y Central Park</h3></summary>
+          <div class="recuerdos-content">
+            <p class="story">Mañana en el Museo Americano de Historia Natural, cruzando después Central Park a pie. Comida en Serafina (79th St) — el Guggenheim no se hizo esta vez. En la noche, Times Square otra vez, cena ligera con un corn dog.</p>
+            
+            <div class="rgrid" id="grid-d5"></div>
+            <div class="upload-row">
+              <button class="upload-btn" data-day="d5">📷 Agregar foto/video</button>
+              <span class="upload-status" id="status-d5"></span>
+            </div>
+            <input type="file" id="file-d5" accept="image/*,video/*" multiple>
+          </div>
+        </details>
         <p><span class="tag">B / C</span> a 81 St: Museo Americano de Historia Natural (CityPASS, entrada 11:00am).</p>
         <p>Cruzar Central Park a pie.</p>
         <p class="confirmed">Comida · Serafina, 79th St</p>
@@ -479,7 +566,19 @@
       <div class="stop-dot"></div>
       <div class="stop-card">
         <div class="stop-date">Domingo 12 jul</div>
-        <h3>Empire State + noche dividida</h3>
+        <details class="day-recuerdos" id="d6-recuerdos">
+          <summary><h3>Empire State + noche dividida</h3></summary>
+          <div class="recuerdos-content">
+            <p class="story">Empire State Building en el CityPASS. En la noche, Manuel y Sofía al concierto de Bon Jovi en el Madison Square Garden; Gaby y Eugenia a Summit One Vanderbilt (Ascent).</p>
+            <p class="pending">Todavía no pasa — cuéntame cómo les fue y lo actualizo.</p>
+            <div class="rgrid" id="grid-d6"></div>
+            <div class="upload-row">
+              <button class="upload-btn" data-day="d6">📷 Agregar foto/video</button>
+              <span class="upload-status" id="status-d6"></span>
+            </div>
+            <input type="file" id="file-d6" accept="image/*,video/*" multiple>
+          </div>
+        </details>
         <p>Empire State Building (CityPASS, entrada 12:00pm) — a 3 cuadras del Madison Square Garden.</p>
         <details class="logistics" id="d6-logistica">
           <summary>Logística detallada del día</summary>
@@ -512,7 +611,19 @@
       <div class="stop-dot"></div>
       <div class="stop-card">
         <div class="stop-date">Lunes 13 jul</div>
-        <h3>Estatua de la Libertad + Ellis Island</h3>
+        <details class="day-recuerdos" id="d7-recuerdos">
+          <summary><h3>Estatua de la Libertad + Ellis Island</h3></summary>
+          <div class="recuerdos-content">
+            <p class="story">Ferry a la Estatua de la Libertad y Ellis Island. En la noche, Times Square otra vez si les late repetir, y maletas con calma — última noche del viaje.</p>
+            <p class="pending">Todavía no pasa — cuéntame cómo les fue y lo actualizo.</p>
+            <div class="rgrid" id="grid-d7"></div>
+            <div class="upload-row">
+              <button class="upload-btn" data-day="d7">📷 Agregar foto/video</button>
+              <span class="upload-status" id="status-d7"></span>
+            </div>
+            <input type="file" id="file-d7" accept="image/*,video/*" multiple>
+          </div>
+        </details>
         <p><span class="tag">4 / 5</span> a Bowling Green. Ferry de las 12:00pm desde Battery Park (CityPASS) — lleguen 30-45 min antes por seguridad.</p>
         <p class="muted">Medio día con el ferry.</p>
         <p class="muted">Times Square (ya fueron el sábado) — opcional si quieren repetir. Última noche en el hotel, maletas con calma.</p>
@@ -540,7 +651,19 @@
       <div class="stop-dot"></div>
       <div class="stop-card">
         <div class="stop-date">Martes 14 jul</div>
-        <h3>Salida</h3>
+        <details class="day-recuerdos" id="d8-recuerdos">
+          <summary><h3>Salida</h3></summary>
+          <div class="recuerdos-content">
+            <p class="story">Taxi al JFK muy temprano. Vuelo AM407 de regreso a Monterrey.</p>
+            <p class="pending">Todavía no pasa — cuéntame cómo les fue y lo actualizo.</p>
+            <div class="rgrid" id="grid-d8"></div>
+            <div class="upload-row">
+              <button class="upload-btn" data-day="d8">📷 Agregar foto/video</button>
+              <span class="upload-status" id="status-d8"></span>
+            </div>
+            <input type="file" id="file-d8" accept="image/*,video/*" multiple>
+          </div>
+        </details>
         <p><span class="tag">JFK T4</span> Taxi/Uber desde el hotel ~6:15am.</p>
         <p class="confirmed">Vuelo confirmado · AM407, 9:30am → Monterrey 12:15pm</p>
         <details class="logistics" id="d8-logistica">
@@ -797,13 +920,78 @@
     }, 1800);
   });
 
+  // ---------- Recuerdos: fotos y videos ----------
+  document.querySelectorAll(".upload-btn").forEach(btn=>{
+    btn.addEventListener("click", ()=> document.getElementById("file-" + btn.dataset.day).click());
+  });
+
+  document.querySelectorAll('input[type=file][id^="file-d"]').forEach(input=>{
+    input.addEventListener("change", async (e)=>{
+      const dayId = input.id.replace("file-", "");
+      const status = document.getElementById("status-" + dayId);
+      const files = Array.from(e.target.files);
+      if(!files.length) return;
+      const author = whoAmI || "alguien";
+      let done = 0;
+      for(const file of files){
+        status.textContent = `Subiendo ${done+1}/${files.length}…`;
+        try{
+          const ext = file.name.split(".").pop();
+          const path = `${dayId}/${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext}`;
+          const { error: upErr } = await sb.storage.from("recuerdos").upload(path, file, { contentType: file.type, upsert:false });
+          if(upErr) throw upErr;
+          const { data: urlData } = sb.storage.from("recuerdos").getPublicUrl(path);
+          const mediaType = file.type.startsWith("video/") ? "video" : "image";
+          await sb.from("trip_memories").insert({ trip_key: TRIP_KEY, day_key: dayId, media_url: urlData.publicUrl, media_type: mediaType, author });
+          done++;
+        }catch(err){
+          console.error(err);
+          status.textContent = "Error al subir";
+          return;
+        }
+      }
+      status.textContent = `✓ ${done} subido(s)`;
+      setTimeout(()=> status.textContent = "", 2500);
+      input.value = "";
+      loadMemories();
+    });
+  });
+
+  function renderMemGrid(dayId, items){
+    const grid = document.getElementById("grid-" + dayId);
+    if(!grid) return;
+    grid.innerHTML = "";
+    items.forEach(m=>{
+      if(m.media_type === "video"){
+        const wrap = document.createElement("div");
+        wrap.className = "vwrap";
+        wrap.innerHTML = `<video src="${m.media_url}" controls playsinline></video><span class="vbadge">VIDEO</span>`;
+        grid.appendChild(wrap);
+      } else {
+        const a = document.createElement("a");
+        a.href = m.media_url; a.target = "_blank";
+        a.innerHTML = `<img src="${m.media_url}" loading="lazy">`;
+        grid.appendChild(a);
+      }
+    });
+  }
+
+  async function loadMemories(){
+    const { data, error } = await sb.from("trip_memories").select("*").eq("trip_key", TRIP_KEY).order("created_at", { ascending:true });
+    if(error){ console.error(error); return; }
+    const byDay = {};
+    data.forEach(m=>{ (byDay[m.day_key] ||= []).push(m); });
+    Object.keys(byDay).forEach(dayId=> renderMemGrid(dayId, byDay[dayId]));
+  }
+
   // ---------- Realtime ----------
   sb.channel("trip-live")
     .on("postgres_changes", { event:"*", schema:"public", table:"trip_suggestions" }, loadNotes)
     .on("postgres_changes", { event:"*", schema:"public", table:"trip_checklist" }, loadChecklist)
+    .on("postgres_changes", { event:"*", schema:"public", table:"trip_memories" }, loadMemories)
     .subscribe();
 
-  // Si llegan con un anchor a un bloque de logística, ábrelo automático
+  // Si llegan con un anchor a un bloque de logística o recuerdos, ábrelo automático
   if (location.hash) {
     const target = document.querySelector(location.hash);
     if (target && target.tagName === "DETAILS") {
@@ -814,6 +1002,8 @@
 
   loadChecklist();
   loadNotes();
+  loadMemories();
 </script>
+
 </body>
 </html>
