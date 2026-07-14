@@ -1089,16 +1089,6 @@
     });
   }
 
-  function getBrowserLocation(){
-    return new Promise(resolve=>{
-      if(!navigator.geolocation){ resolve(null); return; }
-      navigator.geolocation.getCurrentPosition(
-        pos => resolve({ latitude: pos.coords.latitude, longitude: pos.coords.longitude }),
-        () => resolve(null),
-        { timeout: 6000, maximumAge: 120000 }
-      );
-    });
-  }
 
   document.querySelectorAll('input[type=file][id^="file-d"]').forEach(input=>{
     input.addEventListener("change", async (e)=>{
@@ -1114,7 +1104,7 @@
           // 1) Intentar leer EXIF (fecha + GPS) de la foto
           const exifData = await readExif(file);
           const takenAt = getExifGPSDateTime(exifData) || getExifDate(exifData);
-          const gps = getExifGPS(exifData) || await getBrowserLocation();
+          const gps = getExifGPS(exifData);
           let guessedLocation = null;
           let geocodeError = null;
           if(gps){
@@ -1124,7 +1114,6 @@
           const debugInfo = {
             fileType: file.type,
             hasGPS: !!gps,
-            gpsSource: gps ? (getExifGPS(exifData) ? "exif" : "navegador") : null,
             gps: gps || null,
             rawGPSLatitude: exifData?.GPSLatitude || null,
             rawGPSLongitude: exifData?.GPSLongitude || null,
