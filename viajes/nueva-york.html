@@ -1095,7 +1095,7 @@
       if(!files.length) return;
       const status = document.getElementById("status-" + dayId);
       const author = window.GOTI_USER || "alguien";
-      const MAX_BYTES = 300 * 1024 * 1024; // 300MB
+      const MAX_BYTES = 500 * 1024 * 1024; // 500MB
       let done = 0;
       const failed = [];
       for(let i=0; i<files.length; i++){
@@ -1203,7 +1203,7 @@
       const el = document.createElement("div");
       el.className = "gcell";
       if(m.media_type === "video"){
-        el.innerHTML = `<video src="${m.media_url}" playsinline muted></video><span class="vbadge">VIDEO</span>`;
+        el.innerHTML = `<video src="${m.media_url}#t=0.5" preload="metadata" playsinline muted></video><span class="vbadge">VIDEO</span>`;
       } else {
         el.innerHTML = `<img src="${m.media_url}" loading="lazy">`;
       }
