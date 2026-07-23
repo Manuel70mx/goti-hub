@@ -833,6 +833,7 @@
   const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpneHpibnBiaGJycnNlZGptbmJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzMjkzMzksImV4cCI6MjA5NzkwNTMzOX0.PHAVOJYURjM0PP0_Otxa5rn1-Xc-hRhxkB6wWatp4MM";
   const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   const TRIP_KEY = "nyc-2026";
+  const R2_PUBLIC_URL = "https://pub-19528647c5f548ebbb2c1e017a79f514.r2.dev";
 
   const CHECKLIST_ORDER = [
     "citypass-liberty","citypass-911","citypass-naturalhistory","citypass-guggenheim","citypass-empirestate",
@@ -1140,17 +1141,25 @@
             allExifKeys: Object.keys(exifData || {})
           };
 
-          // 2) Subir el archivo
+          // 2) Subir el archivo a Cloudflare R2 (vía URL prefirmada)
           const ext = file.name.split(".").pop();
           const path = `${dayId}/${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext}`;
-          const { error: upErr } = await sb.storage.from("recuerdos").upload(path, file, { contentType: file.type, upsert:false });
-          if(upErr) throw upErr;
-          const { data: urlData } = sb.storage.from("recuerdos").getPublicUrl(path);
+          const { data: presignData, error: presignErr } = await sb.functions.invoke("r2-presign", {
+            body: { path, contentType: file.type }
+          });
+          if(presignErr || !presignData?.uploadUrl) throw presignErr || new Error("no se pudo preparar la subida");
+          const putRes = await fetch(presignData.uploadUrl, {
+            method: "PUT",
+            headers: { "Content-Type": file.type },
+            body: file
+          });
+          if(!putRes.ok) throw new Error(`R2 respondió ${putRes.status}`);
+          const publicUrl = `${R2_PUBLIC_URL}/${path}`;
           const mediaType = file.type.startsWith("video/") ? "video" : "image";
 
           // 3) Guardar con lo que se pudo adivinar (queda editable después)
           const { error: insErr } = await sb.from("trip_memories").insert({
-            trip_key: TRIP_KEY, day_key: dayId, media_url: urlData.publicUrl, storage_path: path,
+            trip_key: TRIP_KEY, day_key: dayId, media_url: publicUrl, storage_path: path,
             media_type: mediaType, author, location: guessedLocation, caption: null, taken_at: takenAt,
             debug_exif: debugInfo
           });
@@ -1289,7 +1298,7 @@
     if(!confirm("¿Eliminar esta foto/video? No se puede deshacer.")) return;
     try{
       if(m.storage_path){
-        await sb.storage.from("recuerdos").remove([m.storage_path]);
+        await sb.functions.invoke("r2-delete", { body: { path: m.storage_path } });
       }
       await sb.from("trip_memories").delete().eq("id", m.id);
       await loadMemories();
